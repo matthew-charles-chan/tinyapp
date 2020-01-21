@@ -1,3 +1,4 @@
+const generateRandomString = require('./generateRandomString');
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -5,6 +6,7 @@ const bodyParser = require('body-parser');
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -20,7 +22,6 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 
 });
-
 
 app.get("/urls", (req, res) => {
   let templateVars = {urls: urlDatabase};
@@ -39,8 +40,15 @@ app.get('/', (req, res) => {
   res.send("Hello!");
 });
 
+app.post("/urls", (req, res) => {
+  console.log(req.body);
+  res.send("Ok");
+});
+
 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+// console.log(generateRandomString())
