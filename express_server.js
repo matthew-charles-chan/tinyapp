@@ -35,12 +35,21 @@ app.get("/urls", (req, res) => {
 app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
 });
-
-// app.get("/hello", (req, res) => {
-//   res.send("<html><body>Hello <b>World</b></body></html>\n");
-// });
  
 app.get('/', (req, res) => {
+  res.redirect("/urls");
+});
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  
+  res.redirect("/urls");
+});
+
+app.post("/urls/:id", (req, res) => {
+  const longURL = req.body.longURL;
+  urlDatabase[req.params.id] = longURL;
+
   res.redirect("/urls");
 });
 
@@ -51,11 +60,6 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${newShortURL}`);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  
-  res.redirect("/urls");
-});
 
 
 
