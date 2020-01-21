@@ -6,6 +6,6 @@ const generateRandomString = function() {
     result += chars.charAt(Math.floor(Math.random() * charsLength));
   }
   return result;
-}
+};
 
 module.exports = generateRandomString;
