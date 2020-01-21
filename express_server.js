@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 
-
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -37,12 +36,12 @@ app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body>Hello <b>World</b></body></html>\n");
+// });
+ 
 app.get('/', (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
 app.post("/urls", (req, res) => {
@@ -50,6 +49,12 @@ app.post("/urls", (req, res) => {
   const newShortURL = generateRandomString();
   urlDatabase[newShortURL] = req.body.longURL;
   res.redirect(`/urls/${newShortURL}`);
+});
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  
+  res.redirect("/urls");
 });
 
 
