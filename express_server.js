@@ -72,6 +72,10 @@ app.get("/register", (req, res) => {
   res.render("user_registration");
 });
 
+app.get("/login", (req, res) => {
+  res.render("user_login");
+});
+
 // redirect / to urls page
 app.get('/', (req, res) => {
   res.redirect("/urls");

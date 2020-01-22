@@ -8,16 +8,11 @@
       <a class="nav-item nav-link" href="/urls">My URLs</a>
       <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
     </div>
-    <% if(!username) {%>
-      <form style="justify-content: right;" class="form-inline" method="POST" action="/login">
-        <input class="form-control mb-0 mt-0" type="text" name="username" placeholder="username" style="width: 300px; margin:1em">
-        <button type="submit" class="btn btn-outline-light">login</button>
-      </form>
-    <% } else { %>
-      <form style="justify-content: right;" class="form-inline" method="POST" action="/logout">
-        <h6 class="mr-3 mb-0 text-light">Logged in as: <%= username%></h6>
-        <button type="submit" class="btn btn-outline-light">logout</button>
-      </form>
-    <% } %>
+    <form style="justify-content: right;" class="form-inline mr-3" method="GET" action="/login">
+      <button type="submit" class="btn btn-outline-light">login</button>
+    </form>
+    <form style="justify-content: right;" class="form-inline" method="GET" action="/register">
+      <button type="submit" class="btn btn-outline-light">register</button>
+    </form>
   </nav>
 </header>

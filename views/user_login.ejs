@@ -9,7 +9,11 @@
     <title>TinyApp - Login</title>
   </head>
 <body>
-  <h3>Create Account</h3>
+  <header>
+    <%- include("./partials/_header.ejs") %>
+  </header>
+
+  <h3 class="ml-3 mt-3">Login</h3>
   <form class="form" action="/login" method="POST">
     <div class="form-group mb-2">
       <label for="email" class="ml-3">Email Address:</label>
