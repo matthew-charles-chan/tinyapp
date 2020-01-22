@@ -1,5 +1,5 @@
 const generateRandomString = require('./generateRandomString');
-const lookupEmail = require('./lookupEmail');
+const lookupEmail = require('./emailLookup');
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -69,11 +69,17 @@ app.get("/urls.json", (req,res) => {
 
 //renders registration page
 app.get("/register", (req, res) => {
-  res.render("user_registration");
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("user_registration", templateVars);
 });
 
 app.get("/login", (req, res) => {
-  res.render("user_login");
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("user_login", templateVars);
 });
 
 // redirect / to urls page
@@ -107,13 +113,23 @@ app.post("/urls", (req, res) => {
 
 //login with username (cookie)
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username);
-  res.redirect("/urls");
+  if (lookupEmail(users, req.body.email)) {
+    let userData = lookupEmail(users, req.body.email);
+    if (userData.password === req.body.password) {
+      res.cookie("user_id", userData.id);
+      res.redirect("/urls");
+    }
+  } else {
+    res.sendStatus(400);
+    return;
+  }
+  // res.cookie("username", req.body.username);
+  // res.redirect("/urls");
 });
 
 //logout, clear cookie
-app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+app.post("/register", (req, res) => {
+  res.clearCookie("user_id");
   res.redirect("/urls");
 });
 
