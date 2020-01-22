@@ -26,6 +26,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 
+// READ specific url 
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
@@ -35,6 +36,8 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
+
+// BROWSE all urls
 app.get("/urls", (req, res) => {
   let templateVars = {
     username: req.cookies["username"],
@@ -43,20 +46,27 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+
+// display urls as JSON
 app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
 });
- 
+
+
+// redirect / to urls page
 app.get('/', (req, res) => {
   res.redirect("/urls");
 });
 
+
+// DELETE key:vlue pair in urlDatabase
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   
   res.redirect("/urls");
 });
 
+// EDIT longURL
 app.post("/urls/:id", (req, res) => {
   console.log(req.body);
   const longURL = req.body.longURL;
@@ -74,11 +84,14 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${newShortURL}`);
 });
 
+
+//login with username (cookie)
 app.post("/login", (req, res) => {
   res.cookie("username", req.body.username);
   res.redirect("/urls");
 });
 
+//logout, clear cookie
 app.post("/logout", (req, res) => {
   res.clearCookie("username");
   res.redirect("/urls");
