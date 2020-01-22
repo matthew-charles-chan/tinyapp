@@ -14,14 +14,17 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
+// create new shortURL
 app.get("/urls/new", (req, res) => {
   res.render("urls_new", { username: req.cookies["username"] });
 });
+
 
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
