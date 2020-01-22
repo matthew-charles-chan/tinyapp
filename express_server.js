@@ -13,6 +13,19 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+// user database
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+};
 
 // redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
@@ -25,8 +38,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", { username: req.cookies["username"] });
 });
 
-
-// READ specific url 
+// READ specific url
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
@@ -35,7 +47,6 @@ app.get("/urls/:shortURL", (req, res) => {
   };
   res.render("urls_show", templateVars);
 });
-
 
 // BROWSE all urls
 app.get("/urls", (req, res) => {
@@ -46,18 +57,21 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-
 // display urls as JSON
 app.get("/urls.json", (req,res) => {
   res.json(urlDatabase);
 });
 
 
+//renders registration page
+app.get("/register", (req, res) => {
+  res.render("user_registration");
+});
+
 // redirect / to urls page
 app.get('/', (req, res) => {
   res.redirect("/urls");
 });
-
 
 // DELETE key:vlue pair in urlDatabase
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -75,15 +89,13 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
-
 //create new URL
 app.post("/urls", (req, res) => {
   console.log(req.body);
-  const newShortURL = generateRandomString();
+  const newShortURL = generateRandomString(6);
   urlDatabase[newShortURL] = req.body.longURL;
   res.redirect(`/urls/${newShortURL}`);
 });
-
 
 //login with username (cookie)
 app.post("/login", (req, res) => {
@@ -97,6 +109,17 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+// ADD user through register form
+app.post("/register", (req, res) =>{
+  const userID = generateRandomString(8);
+  users[userID] = {
+    id: userID,
+    email: req.body.email,
+    password: req.body.password
+  };
+  res.cookie("user_id", userID);
+  res.redirect("/urls");
+});
 
 
 
