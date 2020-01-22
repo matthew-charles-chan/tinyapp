@@ -111,24 +111,23 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${newShortURL}`);
 });
 
-//login with username (cookie)
+//login with user_id (cookie)
 app.post("/login", (req, res) => {
   if (lookupEmail(users, req.body.email)) {
     let userData = lookupEmail(users, req.body.email);
     if (userData.password === req.body.password) {
       res.cookie("user_id", userData.id);
       res.redirect("/urls");
+    } else {
+      res.sendStatus(403);
     }
   } else {
-    res.sendStatus(400);
-    return;
+    res.sendStatus(403);
   }
-  // res.cookie("username", req.body.username);
-  // res.redirect("/urls");
 });
 
 //logout, clear cookie
-app.post("/register", (req, res) => {
+app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
@@ -154,6 +153,7 @@ app.post("/register", (req, res) =>{
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
+
 
 
 
