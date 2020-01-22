@@ -36,7 +36,10 @@ app.get("/u/:shortURL", (req, res) => {
 
 // create new shortURL
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new", { username: req.cookies["username"] });
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  };
+  res.render("urls_new", templateVars);
 });
 
 // READ specific url
@@ -44,7 +47,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
 });
@@ -52,8 +55,8 @@ app.get("/urls/:shortURL", (req, res) => {
 // BROWSE all urls
 app.get("/urls", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"],
-    urls: urlDatabase
+    urls: urlDatabase,
+    user: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templateVars);
 });
@@ -122,7 +125,7 @@ app.post("/register", (req, res) =>{
     res.sendStatus(400);
     return;
   }
-  // if (req.body.email in users)
+  // if req.body.email not in users, register new user
   users[userID] = {
     id: userID,
     email: req.body.email,
