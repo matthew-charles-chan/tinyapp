@@ -1,4 +1,5 @@
 const generateRandomString = require('./generateRandomString');
+const lookupEmail = require('./lookupEmail');
 const express = require('express');
 const app = express();
 const PORT = 8080;
@@ -112,6 +113,16 @@ app.post("/logout", (req, res) => {
 // ADD user through register form
 app.post("/register", (req, res) =>{
   const userID = generateRandomString(8);
+  if (req.body.email === "" || req.body.password === "") {
+    res.sendStatus(400);
+    return;
+  }
+  // checks if email already exists in database
+  if (lookupEmail(users, req.body.email)) {
+    res.sendStatus(400);
+    return;
+  }
+  // if (req.body.email in users)
   users[userID] = {
     id: userID,
     email: req.body.email,
