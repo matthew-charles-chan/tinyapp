@@ -106,6 +106,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // EDIT longURL
 app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
+  console.log(users[req.session["user_id"]]);
   // if shortURL not created by user, or user not logged in, return status code 403
   if (!users[req.session["user_id"]] || users[req.session["user_id"]].id !== urlDatabase[req.params.id].userID) {
     res.sendStatus(403);
@@ -126,14 +127,15 @@ app.post("/urls", (req, res) => {
     userID: users[req.session["user_id"]].id
   };
   res.redirect(`/urls/${newShortURL}`);
+  console.log(urlDatabase);
 });
 
 //login with user_id (cookie)
 app.post("/login", (req, res) => {
   if (lookupEmail(users, req.body.email)) {
-    let userData = lookupEmail(users, req.body.email);
-    if (bcrypt.compareSync(req.body.password, userData.password)) {
-      req.session["user_id"] = userData.id;
+    let userObj = lookupEmail(users, req.body.email);
+    if (bcrypt.compareSync(req.body.password, userObj.password)) {
+      req.session["user_id"] = userObj.id;
       res.redirect("/urls");
     } else {
       res.sendStatus(403);

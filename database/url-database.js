@@ -1,6 +1,9 @@
 const urlDatabase = {
-  "b2xVn2" : { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
-  "9sm5xK" : { longURL: "http://www.google.com", userID: "user2RandomID" }
+  'jPIlTn': { longURL: 'http://www.amazon.ca', userID: 'Yl7sikI5' },
+  'RnVVTK': { longURL: 'http://www.reddit.com', userID: 'Yl7sikI5' },
+  'sAkE6X': { longURL: 'http://www.lighthouselabs.ca', userID: 'Yl7sikI5' },
+  '8wZhhF': { longURL: 'http://www.facebook.com', userID: 'qx2CcRNR' },
+  'eqpKRs': { longURL: 'http://www.gizmodo.com', userID: 'qx2CcRNR' }
 };
 
 module.exports = { urlDatabase };
