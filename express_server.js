@@ -6,10 +6,13 @@ const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const lookupUsersURL = require('./lookupUsersURLS');
+const bcrypt = require("bcrypt");
 
 app.set("view engine", "ejs");
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
+
 
 const urlDatabase = {
   "b2xVn2" : { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
@@ -144,7 +147,7 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   if (lookupEmail(users, req.body.email)) {
     let userData = lookupEmail(users, req.body.email);
-    if (userData.password === req.body.password) {
+    if (bcrypt.compareSync(userData.password, req.body.password)) {
       res.cookie("user_id", userData.id);
       res.redirect("/urls");
     } else {
@@ -177,8 +180,9 @@ app.post("/register", (req, res) =>{
   users[userID] = {
     id: userID,
     email: req.body.email,
-    password: req.body.password
+    password: bcrypt.hashSync(req.body.password, 10)
   };
+  console.log(users)
   res.cookie("user_id", userID);
   res.redirect("/urls");
 });
