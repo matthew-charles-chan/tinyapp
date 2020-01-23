@@ -27,6 +27,11 @@ const users = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
+  },
+  "aaa": {
+    id: "aaa",
+    email: "a@a.com",
+    password: "bbb"
   }
 };
 
@@ -66,7 +71,6 @@ app.get("/urls", (req, res) => {
     return;
   }
   const userURLS = lookupUsersURL(user, urlDatabase);
-  console.log(userURLS);
   let templateVars = {
     urls: userURLS,
     user: user
@@ -102,19 +106,28 @@ app.get('/', (req, res) => {
 
 // DELETE key:vlue pair in urlDatabase
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  
-  res.redirect("/urls");
+  // if shortURL not created by user, or user not logged in, return status code 403
+  if (!users[req.cookies["user_id"]] || users[req.cookies["user_id"]].id !== urlDatabase[req.params.shortURL].userID) {
+    res.sendStatus(403);
+  } else {
+    delete urlDatabase[req.params.shortURL];
+    res.redirect("/urls");
+  }
 });
 
 // EDIT longURL
 app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
-  urlDatabase[req.params.id] = {
-    longURL: longURL,
-    userID: users[req.cookies["user_id"]].id
-  };
-  res.redirect("/urls");
+  // if shortURL not created by user, or user not logged in, return status code 403
+  if (!users[req.cookies["user_id"]] || users[req.cookies["user_id"]].id !== urlDatabase[req.params.id].userID) {
+    res.sendStatus(403);
+  } else {
+    urlDatabase[req.params.id] = {
+      longURL: longURL,
+      userID: users[req.cookies["user_id"]].id
+    };
+    res.redirect("/urls");
+  }
 });
 
 //create new URL
