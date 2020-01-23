@@ -5,15 +5,17 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const lookupUsersURL = require('./lookupUsersURLS');
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2" : { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
+  "9sm5xK" : { longURL: "http://www.google.com", userID: "user2RandomID" }
 };
+
 // user database
 const users = {
   "userRandomID": {
@@ -30,7 +32,7 @@ const users = {
 
 // redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
@@ -50,7 +52,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
@@ -100,18 +102,21 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // EDIT longURL
 app.post("/urls/:id", (req, res) => {
-  console.log(req.body);
   const longURL = req.body.longURL;
-  urlDatabase[req.params.id] = longURL;
-
+  urlDatabase[req.params.id] = {
+    longURL: longURL,
+    userID: users[req.cookies["user_id"]].id
+  };
   res.redirect("/urls");
 });
 
 //create new URL
 app.post("/urls", (req, res) => {
-  console.log(req.body);
   const newShortURL = generateRandomString(6);
-  urlDatabase[newShortURL] = req.body.longURL;
+  urlDatabase[newShortURL] = {
+    longURL: req.body.longURL,
+    userID: users[req.cookies["user_id"]].id
+  };
   res.redirect(`/urls/${newShortURL}`);
 });
 
