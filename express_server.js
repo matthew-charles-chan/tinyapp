@@ -85,12 +85,6 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
-// display urls as JSON
-app.get("/urls.json", (req,res) => {
-  res.json(urlDatabase);
-});
-
-
 //renders registration page
 app.get("/register", (req, res) => {
   let templateVars = {
