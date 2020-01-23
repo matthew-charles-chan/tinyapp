@@ -21,7 +21,7 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: "abc"
   },
   "user2RandomID": {
     id: "user2RandomID",
@@ -60,9 +60,16 @@ app.get("/urls/:shortURL", (req, res) => {
 
 // BROWSE all urls
 app.get("/urls", (req, res) => {
+  const user = users[req.cookies["user_id"]];
+  if (!user) {
+    res.redirect("/login");
+    return;
+  }
+  const userURLS = lookupUsersURL(user, urlDatabase);
+  console.log(userURLS);
   let templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies["user_id"]]
+    urls: userURLS,
+    user: user
   };
   res.render("urls_index", templateVars);
 });
@@ -90,7 +97,7 @@ app.get("/login", (req, res) => {
 
 // redirect / to urls page
 app.get('/', (req, res) => {
-  res.redirect("/urls");
+  res.redirect("/login");
 });
 
 // DELETE key:vlue pair in urlDatabase
