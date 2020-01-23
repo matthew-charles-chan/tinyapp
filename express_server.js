@@ -6,14 +6,12 @@
 // set PORT
 const PORT = 8080;
 
-// dependencies
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
-// imports
 const { generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized } = require("./helperFunctions");
 const { urlDatabase } = require("./database/url-database");
 const { users } = require("./database/user-database");
@@ -61,6 +59,7 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
+    urlUserID: urlDatabase[req.params.shortURL].userID,
     user: getUser(req),
   };
   res.render("urls_show", templateVars);
@@ -89,6 +88,7 @@ app.get("/register", (req, res) => {
   res.render("user_registration", templateVars);
 });
 
+// render login page
 app.get("/login", (req, res) => {
   let templateVars = {
     user: getUser(req)
@@ -96,14 +96,14 @@ app.get("/login", (req, res) => {
   res.render("user_login", templateVars);
 });
 
-// redirect / to urls page
+// redirect / to login page
 app.get('/', (req, res) => {
   res.redirect("/login");
 });
 
 // DELETE key:vlue pair in urlDatabase
 app.post("/urls/:shortURL/delete", (req, res) => {
-  // if shortURL not created by user, or user not logged in, return status code 403
+  // if not authorized, send status code: 403
   if (!isAuthorized(req, 'shortURL')) {
     res.sendStatus(403);
   } else {
@@ -116,7 +116,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
   console.log(getUser(req));
-  // if shortURL not created by user, or user not logged in, return status code 403
+  // if not authorized, send status code: 403
   if (!isAuthorized(req, "id")) {
     res.sendStatus(403);
   } else {
@@ -135,8 +135,8 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL,
     userID: getUser(req).id
   };
+
   res.redirect(`/urls/${newShortURL}`);
-  console.log(urlDatabase);
 });
 
 //login with user_id (cookie)
