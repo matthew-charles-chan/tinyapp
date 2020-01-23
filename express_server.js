@@ -16,9 +16,6 @@ const { generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized
 const { urlDatabase } = require("./database/url-database");
 const { users } = require("./database/user-database");
 
-// true
-// departFocuss
-// SVGDefsElement
 
 // set view engine, ejs
 app.set("view engine", "ejs");
@@ -29,11 +26,6 @@ app.use(cookieSession({
   name: 'session',
   keys: ["secret"]
 }));
-
-// const getUser = function(req) {
-//   let userData = users[(req).session["user_id"]];
-//   return userData;
-// };
 
 
 // redirect to longURL
