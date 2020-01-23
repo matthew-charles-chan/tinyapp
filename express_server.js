@@ -1,8 +1,3 @@
-// const generateRandomString = require('./generateRandomString');
-// const lookupEmail = require('./emailLookup');
-// const lookupUsersURL = require('./lookupUsersURLS');
-// const cookieParser = require('cookie-parser');
-
 // set PORT
 const PORT = 8080;
 
@@ -30,8 +25,14 @@ app.use(cookieSession({
 
 // redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
+  // if shorlURL does not exist, display message "not found"
+  if (!urlDatabase[req.params.shortURL]) {
+    res.sendStatus(404);
+  // if shortURL is valid, redirect to long URL
+  } else {
+    const longURL = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longURL);
+  }
 });
 
 // render new URL page
@@ -39,8 +40,10 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: getUser(req)
   };
+  // if user is logged in, render urls_new page
   if (templateVars.user) {
     res.render("urls_new", templateVars);
+  // if user is not logged in, redirect to login
   } else {
     res.redirect("/login");
   }
@@ -60,6 +63,7 @@ app.get("/urls/:shortURL", (req, res) => {
 // BROWSE all urls
 app.get("/urls", (req, res) => {
   const user = getUser(req);
+  // if user is not logged in, redirect to login page
   if (!user) {
     res.redirect("/login");
     return;
@@ -90,7 +94,13 @@ app.get("/login", (req, res) => {
 
 // redirect / to login page
 app.get('/', (req, res) => {
-  res.redirect("/login");
+  // if user is not logged in, redirect to login
+  if (!getUser(req)) {
+    res.redirect("/login");
+  // if user is logged in, redirect to /urls
+  } else {
+    res.redirect("/urls");
+  }
 });
 
 // DELETE key:vlue pair in urlDatabase
@@ -99,6 +109,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   if (!isAuthorized(req, 'shortURL')) {
     res.sendStatus(403);
   } else {
+    // delete shortURL and redirect to /urls
     delete urlDatabase[req.params.shortURL];
     res.redirect("/urls");
   }
@@ -112,6 +123,7 @@ app.post("/urls/:id", (req, res) => {
   if (!isAuthorized(req, "id")) {
     res.sendStatus(403);
   } else {
+    // update shortURL with new longURL
     urlDatabase[req.params.id] = {
       longURL: longURL,
       userID: getUser(req).id
@@ -122,17 +134,23 @@ app.post("/urls/:id", (req, res) => {
 
 //create new URL
 app.post("/urls", (req, res) => {
-  const newShortURL = generateRandomString(6);
-  urlDatabase[newShortURL] = {
-    longURL: req.body.longURL,
-    userID: getUser(req).id
-  };
-
-  res.redirect(`/urls/${newShortURL}`);
+  // if user logged in
+  if (getUser(req)) {
+    const newShortURL = generateRandomString(6);
+    urlDatabase[newShortURL] = {
+      longURL: req.body.longURL,
+      userID: getUser(req).id
+    };
+    res.redirect(`/urls/${newShortURL}`);
+    // if user not logged in, send status code 403
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 //login with user_id (cookie)
 app.post("/login", (req, res) => {
+  // if email e
   if (lookupEmail(users, req.body.email)) {
     let userObj = lookupEmail(users, req.body.email);
     if (bcrypt.compareSync(req.body.password, userObj.password)) {
