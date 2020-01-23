@@ -53,5 +53,16 @@ const isAuthorized = function(req, param) {
   }
 };
 
+// given a url, if url doesn't include http, prefix with http://
+const formatURL = function(longURL) {
+  let formattedURL = "";
+  if (longURL.includes('http')) {
+    formattedURL = longURL;
+  } else {
+    formattedURL = "http://" + longURL;
+  }
+  return formattedURL;
+};
 
-module.exports =  { generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized };
+
+module.exports =  { formatURL, generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized };

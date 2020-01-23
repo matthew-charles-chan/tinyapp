@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
-const { generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized } = require("./helperFunctions");
+const { formatURL, generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized } = require("./helperFunctions");
 const { urlDatabase } = require("./database/url-database");
 const { users } = require("./database/user-database");
 
@@ -138,7 +138,7 @@ app.post("/urls", (req, res) => {
   if (getUser(req)) {
     const newShortURL = generateRandomString(6);
     urlDatabase[newShortURL] = {
-      longURL: req.body.longURL,
+      longURL: formatURL(req.body.longURL),
       userID: getUser(req).id
     };
     res.redirect(`/urls/${newShortURL}`);
@@ -147,8 +147,6 @@ app.post("/urls", (req, res) => {
     res.sendStatus(403);
   }
 });
-
-
 
 //login with user_id (cookie)
 app.post("/login", (req, res) => {
