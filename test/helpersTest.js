@@ -12,7 +12,12 @@ const testUsers = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
-  }
+  },
+  "user3RandomID": {
+    id: "user3RandomID",
+    email: "user3@example.com",
+    password: "hellomotto"
+  },
 };
 
 const testURLs = {
@@ -31,6 +36,14 @@ describe('lookupEmail', function() {
   });
 });
 
+describe('lookupEmail', function() {
+  it('should return undefined for a invalid email', function() {
+    const user = lookupEmail(testUsers,"user4@example.com");
+    const expectedOutput = undefined;
+    assert.equal(user, expectedOutput);
+  });
+});
+
 describe('lookupUsersURLs', function() {
   it('should return a users urls, from their userID', function() {
     const userURLS = lookupUserURLs(testUsers["user2RandomID"], testURLs);
@@ -42,5 +55,14 @@ describe('lookupUsersURLs', function() {
   });
 });
 
-// console.log(lookupUserURLs(testUsers["user2RandomID"], testURLs));
+describe('lookupUsersURLs', function() {
+  it('should return an empty object if user has no URLS', function() {
+    const userURLS = lookupUserURLs(testUsers["user3RandomID"], testURLs);
+    const expectedOutput = {};
+    assert.deepEqual(userURLS, expectedOutput);
+  });
+});
+
+
+
 
