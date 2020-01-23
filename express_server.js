@@ -1,46 +1,33 @@
-const generateRandomString = require('./generateRandomString');
-const lookupEmail = require('./emailLookup');
+// const generateRandomString = require('./generateRandomString');
+// const lookupEmail = require('./emailLookup');
+// const lookupUsersURL = require('./lookupUsersURLS');
+// const cookieParser = require('cookie-parser');
+
+// set PORT
+const PORT = 8080;
+
+// dependencies
 const express = require('express');
 const app = express();
-const PORT = 8080;
 const bodyParser = require('body-parser');
-// const cookieParser = require('cookie-parser');
 const cookieSession = require("cookie-session");
-const lookupUsersURL = require('./lookupUsersURLS');
 const bcrypt = require("bcrypt");
 
+// imports
+const { generateRandomString, lookupUserURLs, lookupEmail } = require("./helperFunctions");
+const { urlDatabase } = require("./database/url-database");
+const { users } = require("./database/user-database");
+
+// set view engine, ejs
 app.set("view engine", "ejs");
 
+// middleware
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
   keys: ["secret"]
 }));
 
-
-const urlDatabase = {
-  "b2xVn2" : { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
-  "9sm5xK" : { longURL: "http://www.google.com", userID: "user2RandomID" }
-};
-
-// user database
-const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "abc"
-  },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  },
-  "aaa": {
-    id: "aaa",
-    email: "a@a.com",
-    password: "bbb"
-  }
-};
 
 // redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
@@ -77,7 +64,7 @@ app.get("/urls", (req, res) => {
     res.redirect("/login");
     return;
   }
-  const userURLS = lookupUsersURL(user, urlDatabase);
+  const userURLS = lookupUserURLs(user, urlDatabase);
   let templateVars = {
     urls: userURLS,
     user: user
@@ -145,9 +132,8 @@ app.post("/urls", (req, res) => {
 app.post("/login", (req, res) => {
   if (lookupEmail(users, req.body.email)) {
     let userData = lookupEmail(users, req.body.email);
-    if (bcrypt.compareSync(userData.password, req.body.password)) {
+    if (bcrypt.compareSync(req.body.password, userData.password)) {
       req.session["user_id"] = userData.id;
-      // res.cookie("user_id", userData.id);
       res.redirect("/urls");
     } else {
       res.sendStatus(403);
@@ -181,6 +167,7 @@ app.post("/register", (req, res) =>{
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 10)
   };
+  console.log(users);
   // res.cookie("user_id", userID);
   req.session["user_id"] = userID;
   res.redirect("/urls");
