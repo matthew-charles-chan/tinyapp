@@ -14,9 +14,13 @@ const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
 // imports
-const { generateRandomString, lookupUserURLs, lookupEmail } = require("./helperFunctions");
+const { generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized } = require("./helperFunctions");
 const { urlDatabase } = require("./database/url-database");
 const { users } = require("./database/user-database");
+
+// true
+// departFocuss
+// SVGDefsElement
 
 // set view engine, ejs
 app.set("view engine", "ejs");
@@ -28,6 +32,11 @@ app.use(cookieSession({
   keys: ["secret"]
 }));
 
+// const getUser = function(req) {
+//   let userData = users[(req).session["user_id"]];
+//   return userData;
+// };
+
 
 // redirect to longURL
 app.get("/u/:shortURL", (req, res) => {
@@ -35,10 +44,10 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-// create new shortURL
+// render new URL page
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    user: users[req.session["user_id"]]
+    user: getUser(req)
   };
   if (templateVars.user) {
     res.render("urls_new", templateVars);
@@ -52,14 +61,14 @@ app.get("/urls/:shortURL", (req, res) => {
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.session["user_id"]],
+    user: getUser(req),
   };
   res.render("urls_show", templateVars);
 });
 
 // BROWSE all urls
 app.get("/urls", (req, res) => {
-  const user = users[req.session["user_id"]];
+  const user = getUser(req);
   if (!user) {
     res.redirect("/login");
     return;
@@ -75,14 +84,14 @@ app.get("/urls", (req, res) => {
 //renders registration page
 app.get("/register", (req, res) => {
   let templateVars = {
-    user: users[req.session["user_id"]]
+    user: getUser(req)
   };
   res.render("user_registration", templateVars);
 });
 
 app.get("/login", (req, res) => {
   let templateVars = {
-    user: users[req.session["user_id"]]
+    user: getUser(req)
   };
   res.render("user_login", templateVars);
 });
@@ -95,7 +104,7 @@ app.get('/', (req, res) => {
 // DELETE key:vlue pair in urlDatabase
 app.post("/urls/:shortURL/delete", (req, res) => {
   // if shortURL not created by user, or user not logged in, return status code 403
-  if (!users[req.session["user_id"]] || users[req.session["user_id"]].id !== urlDatabase[req.params.shortURL].userID) {
+  if (!isAuthorized(req, 'shortURL')) {
     res.sendStatus(403);
   } else {
     delete urlDatabase[req.params.shortURL];
@@ -106,14 +115,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // EDIT longURL
 app.post("/urls/:id", (req, res) => {
   const longURL = req.body.longURL;
-  console.log(users[req.session["user_id"]]);
+  console.log(getUser(req));
   // if shortURL not created by user, or user not logged in, return status code 403
-  if (!users[req.session["user_id"]] || users[req.session["user_id"]].id !== urlDatabase[req.params.id].userID) {
+  if (!isAuthorized(req, "id")) {
     res.sendStatus(403);
   } else {
     urlDatabase[req.params.id] = {
       longURL: longURL,
-      userID: users[req.session["user_id"]].id
+      userID: getUser(req).id
     };
     res.redirect("/urls");
   }
@@ -124,7 +133,7 @@ app.post("/urls", (req, res) => {
   const newShortURL = generateRandomString(6);
   urlDatabase[newShortURL] = {
     longURL: req.body.longURL,
-    userID: users[req.session["user_id"]].id
+    userID: getUser(req).id
   };
   res.redirect(`/urls/${newShortURL}`);
   console.log(urlDatabase);

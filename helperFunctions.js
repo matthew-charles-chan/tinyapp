@@ -1,3 +1,6 @@
+const { users } = require("./database/user-database");
+const { urlDatabase } = require("./database/url-database");
+
 const generateRandomString = function(length) {
   let result = "";
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -29,5 +32,20 @@ const lookupEmail = function(data, email) {
   return userData;
 };
 
+const getUser = function(req) {
+  let userData = users[(req).session["user_id"]];
+  return userData;
+};
 
-module.exports =  { generateRandomString, lookupUserURLs, lookupEmail };
+const isAuthorized = function(req, param) {
+  if (!getUser(req)) {
+    return false;
+  } else if (getUser(req).id !== urlDatabase[req.params[param]].userID) {
+    return false;
+  } else {
+    return true;
+  }
+};
+
+
+module.exports =  { generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized };
