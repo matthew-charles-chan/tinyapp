@@ -1,6 +1,7 @@
 const { users } = require("./database/user-database");
 const { urlDatabase } = require("./database/url-database");
 
+// generates random string with string length as a paramater
 const generateRandomString = function(length) {
   let result = "";
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -11,6 +12,8 @@ const generateRandomString = function(length) {
   return result;
 };
 
+// given a user object, returns all urls created by user. takes user name
+// and url database as parameters
 const lookupUserURLs = function(user, urls) {
   let userURLS = {};
   for (let url in urls) {
@@ -21,6 +24,7 @@ const lookupUserURLs = function(user, urls) {
   return userURLS;
 };
 
+// given an email (string), return the user object
 const lookupEmail = function(data, email) {
   let userData = undefined;
   for (const user in data) {
@@ -32,11 +36,13 @@ const lookupEmail = function(data, email) {
   return userData;
 };
 
+// given http request return, user object
 const getUser = function(req) {
   let userData = users[(req).session["user_id"]];
   return userData;
 };
 
+// given http request and request pararamater, return true/false authorized
 const isAuthorized = function(req, param) {
   if (!getUser(req)) {
     return false;
