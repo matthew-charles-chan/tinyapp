@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const cookieSession = require("cookie-session");
 const bcrypt = require("bcrypt");
 
-const { formatURL, generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized } = require("./helperFunctions");
+const { formatURL, generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized, addCount } = require("./helperFunctions");
 const { urlDatabase } = require("./database/url-database");
 const { users } = require("./database/user-database");
 
@@ -31,6 +31,7 @@ app.get("/u/:shortURL", (req, res) => {
   // if shortURL is valid, redirect to long URL
   } else {
     const longURL = urlDatabase[req.params.shortURL].longURL;
+    addCount(urlDatabase, req.params.shortURL);
     res.redirect(longURL);
   }
 });
@@ -55,7 +56,8 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
     urlUserID: urlDatabase[req.params.shortURL].userID,
-    user: getUser(req),
+    viewCount: urlDatabase[req.params.shortURL].viewCount,
+    user: getUser(req)
   };
   res.render("urls_show", templateVars);
 });
@@ -139,7 +141,8 @@ app.post("/urls", (req, res) => {
     const newShortURL = generateRandomString(6);
     urlDatabase[newShortURL] = {
       longURL: formatURL(req.body.longURL),
-      userID: getUser(req).id
+      userID: getUser(req).id,
+      viewCount: 0
     };
     res.redirect(`/urls/${newShortURL}`);
     // if user not logged in, send status code 403

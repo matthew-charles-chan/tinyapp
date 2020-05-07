@@ -64,5 +64,10 @@ const formatURL = function(longURL) {
   return formattedURL;
 };
 
+const addCount = function(dataBase, shortUrl) {
+  dataBase[shortUrl].viewCount ++;
+  return;
+};
 
-module.exports =  { formatURL, generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized };
+
+module.exports =  { formatURL, generateRandomString, lookupUserURLs, lookupEmail, getUser, isAuthorized, addCount };
